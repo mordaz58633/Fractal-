@@ -1,0 +1,23 @@
+body{
+    background:#111;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+h1{
+    margin-top:20px;
+}
+
+.panel{
+    margin:20px;
+}
+
+canvas{
+    background:black;
+    border:2px solid white;
+}
+
+input{
+    margin:10px;
+}
