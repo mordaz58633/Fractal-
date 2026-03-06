@@ -1,67 +1,68 @@
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 
-let fractalData = null;
+const fileInput = document.getElementById("fileInput");
+const jsonViewer = document.getElementById("jsonViewer");
 
-document.getElementById("fileInput").addEventListener("change", loadJSON);
-document.getElementById("depth").addEventListener("input", draw);
+fileInput.addEventListener("change", function(event){
 
-function loadJSON(event){
+const file = event.target.files[0];
 
-    const file = event.target.files[0];
-    const reader = new FileReader();
+if(!file) return;
 
-    reader.onload = function(e){
+const reader = new FileReader();
 
-        fractalData = JSON.parse(e.target.result);
-        draw();
-    };
+reader.onload = function(e){
 
-    reader.readAsText(file);
-}
+const text = e.target.result;
 
-function draw(){
+jsonViewer.textContent = text;
 
-    if(!fractalData) return;
+const data = JSON.parse(text);
 
-    ctx.clearRect(0,0,canvas.width,canvas.height);
+ctx.clearRect(0,0,canvas.width,canvas.height);
 
-    const depth = document.getElementById("depth").value;
+drawFractal(
+data.startX,
+data.startY,
+data.length,
+data.angle,
+data.depth,
+data
+);
 
-    drawFractal(
-        fractalData.startX,
-        fractalData.startY,
-        fractalData.length,
-        fractalData.angle,
-        depth
-    );
-}
+};
 
-function drawFractal(x,y,length,angle,depth){
+reader.readAsText(file);
 
-    if(depth === 0) return;
+});
 
-    const rad = angle * Math.PI / 180;
+function drawFractal(x,y,length,angle,depth,data){
 
-    const x2 = x + length * Math.cos(rad);
-    const y2 = y + length * Math.sin(rad);
+if(depth <= 0) return;
 
-    ctx.beginPath();
-    ctx.moveTo(x,y);
-    ctx.lineTo(x2,y2);
-    ctx.strokeStyle = "cyan";
-    ctx.stroke();
+const rad = angle * Math.PI / 180;
 
-    fractalData.branches.forEach(branch => {
+const x2 = x + length * Math.cos(rad);
+const y2 = y + length * Math.sin(rad);
 
-        drawFractal(
-            x2,
-            y2,
-            length * branch.scale,
-            angle + branch.angle,
-            depth - 1
-        );
+ctx.beginPath();
+ctx.moveTo(x,y);
+ctx.lineTo(x2,y2);
+ctx.strokeStyle = data.color || "cyan";
+ctx.stroke();
 
-    });
+data.branches.forEach(branch => {
+
+drawFractal(
+x2,
+y2,
+length * branch.scale,
+angle + branch.angle,
+depth - 1,
+data
+);
+
+});
 
 }
